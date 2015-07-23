@@ -118,7 +118,7 @@ function timerFunctions.cancerTimer(player)
             aging.agingPeople[playerName].cancerDuration = 0
             aging.agingPeople[playerName].cancerTherapy = false
             aging.agingPeople[playerName].cancerEnabled = false
-        elseif aging.agingPeople[playerName].cancerTherapy == false then
+        elseif not aging.agingPeople[playerName].cancerTherapy then
             aging.agingPeople[playerName].cancerDuration = aging.agingPeople[playerName].cancerDuration + 1
         end
         local damage = math.floor(18.47 / (1 + 66.3 * math.pow(e, -0.15 * aging.agingPeople[playerName].cancerDuration)))
@@ -156,7 +156,7 @@ minetest.register_chatcommand("agespeed", {
 })
 
 minetest.register_chatcommand("cure", {
-    params = "<name>",
+    params = "<name> or <blank>",
     description = "Cure yourself or another of all current diseases",
     privs = {basic_privs = true},
     func = function(name, param)
@@ -169,6 +169,22 @@ minetest.register_chatcommand("cure", {
         else
             return false, "Error: Could not find player"
         end
+    end,
+})
+
+minetest.register_chatcommand("testing", {
+    params = "<name> or <blank>",
+    description = "Cure yourself or another of all current diseases",
+    privs = {basic_privs = true},
+    func = function(name)
+        local person = minetest.get_player_by_name(name)
+        local pos1p = {x=0,y=-1,z=0}
+        local pos3p = {x=0,y=0,z=0}
+        person:set_eye_offset(pos1p, pos3p)
+        person:set_properties({
+            collisionbox = {-1,-0.5,-0.5, 0.5,-0.5,0.5},
+        })
+        return true, "Eye Offset Set"
     end,
 })
 
@@ -237,6 +253,7 @@ function ager(player, age)
     local hotbarChance = 20 / (1 + 100 * math.pow(e, -0.09 * age))
     local cancerChance = 10 / (1 + 40 * math.pow(e,-0.05 * age))
     local slowMoveChance = 15 / (1 + 500 * math.pow(e,-0.1 * age))
+    local inheritChance = 15 / (1 + 500 * math.pow(e,-0.1 * age))
 
     -- Hotbar Decreaser
     if math.random(100) <= hotbarChance and not aging.agingPeople[playerName].hotbarEnabled then
@@ -255,6 +272,15 @@ function ager(player, age)
         minetest.chat_send_player(playerName, "You can no longer run like you used to.")
         aging.agingPeople[playerName].slowMoveEnabled = true
     end
+
+    -- Inheritance
+    if math.random(100) <= inheritChance and not aging.agingPeople[playerName].inheritance then
+        local relatives = {"uncle", "cousin", "nibling", "aunt"}
+        local relative = relatives[math.ceil(math.random(4))]
+        minetest.chat_send_player(playerName, "Your distant "..relative.." died and left you with some precious items.")
+        player:get
+        aging.agingPeople[playerName].inheritance = true
+    end
 end
 
 function create_age(player)
@@ -263,6 +289,7 @@ function create_age(player)
     aging.agingPeople[playerName].name = playerName
     aging.agingPeople[playerName].age = 0
     aging.agingPeople[playerName].immortality = false
+    aging.agingPeople[playerName].inheritance = false
     cure(player)
 end
 
@@ -283,7 +310,7 @@ function cure(player)
 end
 
 minetest.override_item("default:dry_shrub", {
-    description = "Herb to help Memory",
+    description = "Memory Improving Herbs",
     on_use = function(itemstack, user, pointed_thing)
         itemstack:take_item()
         local playerName = user:get_player_name()
