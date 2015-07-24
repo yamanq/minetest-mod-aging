@@ -278,8 +278,18 @@ function ager(player, age)
         local relatives = {"uncle", "cousin", "nibling", "aunt"}
         local relative = relatives[math.ceil(math.random(4))]
         minetest.chat_send_player(playerName, "Your distant "..relative.." died and left you with some precious items.")
-        player:get
-        aging.agingPeople[playerName].inheritance = true
+        -- aging.agingPeople[playerName].inheritance = true
+        local inventory = player:get_inventory()
+
+        local diamond = math.ceil(math.random(50))
+        inventory:add_item('main', "default:diamond "..diamond)
+
+        local mese = math.ceil(math.random(5))
+        inventory:add_item('main', "default:mese "..mese)
+
+        local gold = math.ceil(math.random(75))
+        inventory:add_item('main', "default:gold_ingot "..gold)
+        return inventory
     end
 end
 
