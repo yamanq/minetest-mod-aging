@@ -253,7 +253,7 @@ function ager(player, age)
     local hotbarChance = 20 / (1 + 100 * math.pow(e, -0.09 * age))
     local cancerChance = 10 / (1 + 40 * math.pow(e, -0.05 * age))
     local slowMoveChance = 15 / (1 + 500 * math.pow(e, -0.1 * age))
-    local inheritChance = 25 / (1 + math.pow(e, -0.16 * (age - 58))
+    local inheritChance = 25 / (1 + math.pow(e, -0.16 * (age - 58)))
 
     -- Hotbar Decreaser
     if math.random(100) <= hotbarChance and not aging.agingPeople[playerName].hotbarEnabled then
